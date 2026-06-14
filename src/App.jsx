@@ -149,17 +149,17 @@ const App = () => {
   }, [data]);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-6 selection:bg-blue-200">
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-3 md:p-6 selection:bg-blue-200">
       <div className="max-w-7xl mx-auto space-y-6">
         
         {/* Header */}
-        <header className="glass-panel p-6 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between border-slate-200 shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-blue-100 rounded-xl border border-blue-200 shadow-sm">
+        <header className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col lg:flex-row gap-4 items-center justify-between border-slate-200 shadow-sm text-center lg:text-left">
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <div className="p-3 bg-blue-100 rounded-xl border border-blue-200 shadow-sm shrink-0">
               <Activity className="w-8 h-8 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-extrabold bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 Transformer Oils Dashboard
               </h1>
               <p className="text-slate-500 font-medium text-sm mt-1">Technical Data Sheet Explorer</p>
@@ -167,7 +167,7 @@ const App = () => {
           </div>
           
           {/* Navigation Tabs */}
-          <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
+          <div className="flex flex-wrap justify-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner w-full lg:w-auto">
             <button 
               onClick={() => setActiveTab('products')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'products' ? 'bg-white text-blue-700 shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-700'}`}
@@ -197,9 +197,9 @@ const App = () => {
 
         {/* PRODUCTS TAB */}
         {activeTab === 'products' && (
-          <div className="flex flex-col md:flex-row gap-6 items-stretch animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="flex flex-col lg:flex-row gap-6 items-stretch animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Sidebar Filters */}
-            <aside className="w-full md:w-72 shrink-0 space-y-6">
+            <aside className="w-full lg:w-72 shrink-0 space-y-6">
               <div className="glass-panel p-5 rounded-2xl">
                 <div className="flex items-center gap-2 mb-6 border-b border-slate-200 pb-3">
                   <Filter className="w-5 h-5 text-blue-600" />
@@ -266,7 +266,7 @@ const App = () => {
             </aside>
 
             {/* Main Grid */}
-            <main className="flex-1 glass-panel rounded-2xl overflow-hidden h-[calc(100vh-160px)] shadow-sm relative">
+            <main className="flex-1 glass-panel rounded-2xl overflow-hidden h-[600px] lg:h-[calc(100vh-160px)] shadow-sm relative">
               <div className="absolute inset-0 overflow-auto custom-scrollbar bg-white/50">
                 <table className="w-full text-left text-sm whitespace-nowrap min-w-max">
                   <thead className="sticky top-0 z-10 bg-slate-100 backdrop-blur-md border-b border-slate-200 text-slate-700 shadow-sm">
@@ -514,23 +514,31 @@ const App = () => {
       {selectedProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
           <div className="bg-white w-full max-w-6xl h-[90vh] rounded-2xl flex flex-col overflow-hidden border border-slate-200 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
-              <div>
-                <h3 className="text-xl font-bold text-slate-800">{selectedProduct['Product Name/Code']}</h3>
-                <p className="text-sm font-semibold text-blue-600 mt-0.5">{selectedProduct['Manufacturer']}</p>
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between px-4 md:px-6 py-4 border-b border-slate-200 bg-slate-50 gap-4">
+              <div className="flex justify-between items-start w-full md:w-auto">
+                <div>
+                  <h3 className="text-xl font-bold text-slate-800">{selectedProduct['Product Name/Code']}</h3>
+                  <p className="text-sm font-semibold text-blue-600 mt-0.5">{selectedProduct['Manufacturer']}</p>
+                </div>
+                <button 
+                  onClick={() => setSelectedProduct(null)}
+                  className="p-2 rounded-lg bg-slate-200 hover:bg-red-100 text-slate-600 hover:text-red-600 transition-colors border border-transparent hover:border-red-200 md:hidden"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
                 <a 
                   href={selectedProduct.localPath} 
                   target="_blank" 
                   rel="noreferrer"
-                  className="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 transition-colors"
+                  className="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 transition-colors w-full justify-center md:w-auto"
                 >
                   Open in New Tab
                 </a>
                 <button 
                   onClick={() => setSelectedProduct(null)}
-                  className="p-2 rounded-lg bg-slate-200 hover:bg-red-100 text-slate-600 hover:text-red-600 transition-colors border border-transparent hover:border-red-200"
+                  className="p-2 rounded-lg bg-slate-200 hover:bg-red-100 text-slate-600 hover:text-red-600 transition-colors border border-transparent hover:border-red-200 hidden md:block"
                 >
                   <X className="w-5 h-5" />
                 </button>
