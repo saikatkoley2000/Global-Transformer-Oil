@@ -156,7 +156,7 @@ const App = () => {
 
         {/* PRODUCTS TAB */}
         {activeTab === 'products' && (
-          <div className="flex flex-col md:flex-row gap-6 items-start animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="flex flex-col md:flex-row gap-6 items-stretch animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Sidebar Filters */}
             <aside className="w-full md:w-72 shrink-0 space-y-6">
               <div className="glass-panel p-5 rounded-2xl">
