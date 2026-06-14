@@ -225,9 +225,9 @@ const App = () => {
             </aside>
 
             {/* Main Grid */}
-            <main className="flex-1 glass-panel rounded-2xl overflow-hidden flex flex-col h-[calc(100vh-160px)] shadow-sm">
-              <div className="flex-1 overflow-auto custom-scrollbar bg-white/50">
-                <table className="w-full text-left text-sm whitespace-nowrap">
+            <main className="flex-1 glass-panel rounded-2xl overflow-hidden h-[calc(100vh-160px)] shadow-sm relative">
+              <div className="absolute inset-0 overflow-auto custom-scrollbar bg-white/50">
+                <table className="w-full text-left text-sm whitespace-nowrap min-w-max">
                   <thead className="sticky top-0 z-10 bg-slate-100 backdrop-blur-md border-b border-slate-200 text-slate-700 shadow-sm">
                     <tr>
                       <th className="px-6 py-4 font-bold tracking-wide">Product Details</th>
