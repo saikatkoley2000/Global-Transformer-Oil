@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Filter, Search, FileText, X, Activity, Globe, Factory, Database } from 'lucide-react';
+import { Filter, Search, FileText, X, Activity, Globe, Factory, Database, BookOpen } from 'lucide-react';
 import rawData from './data.json';
 
 const App = () => {
@@ -21,6 +21,17 @@ const App = () => {
   const [expandedMfrs, setExpandedMfrs] = useState(new Set());
   const toggleMfr = (name) => {
     setExpandedMfrs(prev => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      return next;
+    });
+  };
+
+  // For expanded standards
+  const [expandedStds, setExpandedStds] = useState(new Set());
+  const toggleStd = (name) => {
+    setExpandedStds(prev => {
       const next = new Set(prev);
       if (next.has(name)) next.delete(name);
       else next.add(name);
@@ -75,6 +86,30 @@ const App = () => {
       return matchSearch && matchPrimary && matchGrade && matchSecondary && matchCategory && matchInhibition;
     });
   }, [data, search, filters]);
+
+  // Data for Standard Tab
+  const standards = useMemo(() => {
+    const grouped = {};
+    data.forEach(item => {
+      const std = item['Primary Standard Family'] || 'Unspecified Standard';
+      if (!grouped[std]) {
+        grouped[std] = {
+          grades: new Set(),
+          manufacturers: new Set(),
+          products: []
+        };
+      }
+      if (item['Standard Class/Grade (normalized)']) grouped[std].grades.add(item['Standard Class/Grade (normalized)']);
+      if (item['Manufacturer']) grouped[std].manufacturers.add(item['Manufacturer']);
+      grouped[std].products.push(item);
+    });
+    return Object.keys(grouped).sort().map(s => ({
+      name: s,
+      grades: Array.from(grouped[s].grades).sort(),
+      manufacturers: Array.from(grouped[s].manufacturers).sort(),
+      products: grouped[s].products
+    }));
+  }, [data]);
 
   // Data for Country Tab
   const countries = useMemo(() => {
@@ -138,6 +173,12 @@ const App = () => {
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'products' ? 'bg-white text-blue-700 shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-700'}`}
             >
               <Database className="w-4 h-4" /> Products
+            </button>
+            <button 
+              onClick={() => setActiveTab('standard')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'standard' ? 'bg-white text-indigo-700 shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-700'}`}
+            >
+              <BookOpen className="w-4 h-4" /> Standards
             </button>
             <button 
               onClick={() => setActiveTab('country')}
@@ -280,6 +321,84 @@ const App = () => {
                 </table>
               </div>
             </main>
+          </div>
+        )}
+
+        {/* STANDARD TAB */}
+        {activeTab === 'standard' && (
+          <div className="glass-panel p-8 rounded-2xl min-h-[calc(100vh-160px)] animate-in fade-in slide-in-from-bottom-4 duration-500 bg-white">
+            <h2 className="text-2xl font-bold text-indigo-700 mb-8 flex items-center gap-3 border-b border-slate-100 pb-4">
+              <BookOpen className="w-7 h-7" /> Transformer Oil Standards
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {standards.map((std, idx) => {
+                const isExpanded = expandedStds.has(std.name);
+                const visibleProducts = isExpanded ? std.products : std.products.slice(0, 5);
+                const hasMore = std.products.length > 5;
+
+                return (
+                  <div key={idx} className="bg-white border border-indigo-100 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all hover:border-indigo-300">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-2xl font-extrabold text-slate-800 mb-1">{std.name}</h3>
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-200">
+                          <Factory className="w-3.5 h-3.5" /> {std.manufacturers.length} Manufacturers
+                        </div>
+                      </div>
+                      <div className="text-center bg-slate-50 px-4 py-2 rounded-xl border border-slate-200">
+                        <div className="text-2xl font-black text-blue-600 leading-none">{std.products.length}</div>
+                        <div className="text-[10px] uppercase font-bold text-slate-500 mt-1">Products</div>
+                      </div>
+                    </div>
+                    
+                    {std.grades.length > 0 && (
+                      <div className="mb-4">
+                        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Grades: </span>
+                        <span className="text-sm font-semibold text-slate-700">{std.grades.join(', ')}</span>
+                      </div>
+                    )}
+
+                    <div className="mt-5 pt-4 border-t border-slate-100">
+                      <h4 className="text-sm font-bold text-slate-800 mb-3">Products:</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {visibleProducts.map((p, i) => (
+                          <button 
+                            key={i} 
+                            onClick={() => p.localPath && setSelectedProduct(p)}
+                            className={`text-xs font-medium px-2.5 py-1 rounded-md border text-left flex items-center gap-1.5 transition-all ${
+                              p.localPath 
+                                ? 'bg-white hover:bg-blue-50 text-blue-700 border-blue-200 hover:border-blue-300 cursor-pointer shadow-sm hover:shadow' 
+                                : 'bg-slate-50 text-slate-500 border-slate-200 cursor-default opacity-80'
+                            }`}
+                            title={p.localPath ? "Click to view PDS" : "PDS Unavailable"}
+                          >
+                            {p.localPath && <FileText className="w-3 h-3 text-blue-500" />}
+                            {p['Product Name/Code']}
+                          </button>
+                        ))}
+                        
+                        {!isExpanded && hasMore && (
+                          <button 
+                            onClick={() => toggleStd(std.name)}
+                            className="text-xs font-bold px-2.5 py-1 bg-indigo-100 text-indigo-700 rounded-md border border-indigo-200 hover:bg-indigo-200 transition-colors shadow-sm"
+                          >
+                            +{std.products.length - 5} more
+                          </button>
+                        )}
+                        {isExpanded && hasMore && (
+                          <button 
+                            onClick={() => toggleStd(std.name)}
+                            className="text-xs font-bold px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md border border-slate-200 hover:bg-slate-200 transition-colors shadow-sm"
+                          >
+                            Show less
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
